@@ -2,14 +2,14 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 )
 
 // TODO use sessions
-// TODO replace cookie store secret with ENV var
-var store = sessions.NewCookieStore([]byte("TODO-replace"))
+var store = sessions.NewCookieStore([]byte(os.GetEnv("SESSION_SECRET")))
 
 func main() {
 	c := Context{}
