@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"net/http"
 	"os"
 
@@ -9,9 +10,15 @@ import (
 )
 
 // TODO use sessions
-var store = sessions.NewCookieStore([]byte(os.GetEnv("SESSION_SECRET")))
+var store *sessions.CookieStore
 
 func main() {
+	var (
+		sessionSecret = flag.String("session", os.Getenv("SESSION_SECRET"), "Set the session secret")
+	)
+	flag.Parse()
+	store = sessions.NewCookieStore([]byte(*sessionSecret))
+
 	c := Context{}
 	r := router(c)
 	http.ListenAndServe(":3000", r)
