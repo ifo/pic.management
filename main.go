@@ -25,7 +25,7 @@ type Context struct {
 func router(c Context) *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/", injectContext(indexHandler, c)).Methods("GET")
-	r.HandleFunc("/login", injectContext(loginHandler, c)).Methods("GET")
+	r.HandleFunc("/login", injectContext(loginHandler, c)).Methods("POST")
 	return r
 }
 
