@@ -8,7 +8,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 )
 
@@ -65,26 +64,4 @@ type Context struct {
 	DB          *sql.DB
 	Store       *sessions.CookieStore
 	SessionName string
-}
-
-func router(c Context) *mux.Router {
-	r := mux.NewRouter()
-	r.HandleFunc("/", injectContext(indexHandler, c)).Methods("GET")
-	r.HandleFunc("/login", injectContext(loginHandler, c)).Methods("POST")
-	return r
-}
-
-func injectContext(fn func(http.ResponseWriter, *http.Request, Context), c Context) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		c.Vars = mux.Vars(r)
-		fn(w, r, c)
-	}
-}
-
-func indexHandler(w http.ResponseWriter, r *http.Request, c Context) {
-	w.Write([]byte("Under construction"))
-}
-
-func loginHandler(w http.ResponseWriter, r *http.Request, c Context) {
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
