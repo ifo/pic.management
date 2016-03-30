@@ -15,7 +15,9 @@ func router(c Context) *mux.Router {
 	return r
 }
 
-func injectContext(fn func(http.ResponseWriter, *http.Request, Context), c Context) http.HandlerFunc {
+type contextHandler func(http.ResponseWriter, *http.Request, Context)
+
+func injectContext(fn contextHandler, c Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		c.Vars = mux.Vars(r)
 		fn(w, r, c)
