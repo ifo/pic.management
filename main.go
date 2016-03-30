@@ -1,32 +1,63 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
+	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 )
 
-// TODO use sessions
-var store *sessions.CookieStore
-
 func main() {
+	context, port, err := setup()
+	if err != nil {
+		log.Fatal(err)
+	}
+	r := router(*context)
+	log.Println("Starting server on port " + port)
+	http.ListenAndServe(":"+port, r)
+}
+
+func setup() (*Context, string, error) {
 	var (
-		sessionSecret = flag.String("session", os.Getenv("SESSION_SECRET"), "Set the session secret")
+		defaultSessionSecret = "session-secret"
+		defaultDbURL         = "file:data/sqlite.db"
+		defaultPort          = 3000
+		sessionSecret        = flag.String("session", defaultSessionSecret, "Set the session secret")
+		dbURL                = flag.String("db", defaultDbURL, "Set the database connection string")
+		port                 = flag.Int("port", defaultPort, "Set the server port")
+		envSessionSecret     = os.Getenv("SESSION_SECRET")
+		envDbURL             = os.Getenv("DATABASE_URL")
+		outPort              = os.Getenv("PORT")
 	)
 	flag.Parse()
-	store = sessions.NewCookieStore([]byte(*sessionSecret))
 
-	c := Context{}
-	r := router(c)
-	http.ListenAndServe(":3000", r)
+	if *sessionSecret == defaultSessionSecret && envSessionSecret != "" {
+		sessionSecret = &envSessionSecret
+	}
+	if *dbURL == defaultDbURL && envDbURL != "" {
+		dbURL = &envDbURL
+	}
+	if *port != defaultPort || outPort == "" {
+		outPort = strconv.Itoa(defaultPort)
+	}
+
+	store := sessions.NewCookieStore([]byte(*sessionSecret))
+	db, err := SetupDB(*dbURL)
+	if err != nil {
+		return nil, "", err
+	}
+	return &Context{DB: db, Store: store}, outPort, nil
 }
 
 type Context struct {
-	Vars map[string]string
-	// TODO have db connection or other data here
+	Vars  map[string]string
+	DB    *sql.DB
+	Store *sessions.CookieStore
 }
 
 func router(c Context) *mux.Router {
