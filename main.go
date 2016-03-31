@@ -24,7 +24,7 @@ func main() {
 func setup() (*Context, string, error) {
 	var (
 		defaultSessionSecret = "session-secret"
-		defaultDbURL         = "file:data/sqlite.db"
+		defaultDbURL         = "file:db/sqlite.db"
 		defaultPort          = 3000
 		defaultSessionName   = "session-name"
 		sessionSecret        = flag.String("session", defaultSessionSecret, "Set the session secret")
