@@ -56,7 +56,7 @@ func setup() (*Context, string, error) {
 	if err != nil {
 		return nil, "", err
 	}
-	return &Context{DB: db, Store: store}, outPort, nil
+	return &Context{DB: db, Store: store, SessionName: *sessionName}, outPort, nil
 }
 
 type Context struct {
