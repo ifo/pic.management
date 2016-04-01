@@ -9,7 +9,7 @@ import (
 func router(c Context) *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/", addMiddleware(indexHandler, c)).Methods("GET")
-	r.HandleFunc("/login", addMiddleware(loginHandler, c)).Methods("POST")
+	r.HandleFunc("/login", addMiddleware(loginHandler, c)).Methods("GET", "POST")
 	return r
 }
 
