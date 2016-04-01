@@ -8,7 +8,7 @@ import (
 
 func router(c Context) *mux.Router {
 	r := mux.NewRouter()
-	r.HandleFunc("/", addMiddleware(indexHandler, c)).Methods("GET")
+	r.HandleFunc("/", addMiddleware(indexHandler, c, isAuthed)).Methods("GET")
 	r.HandleFunc("/login", addMiddleware(loginHandler, c)).Methods("GET", "POST")
 	return r
 }
@@ -22,7 +22,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request, c Context) {
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request, c Context) {
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	w.Write([]byte("Login under construction"))
 }
 
 func addMiddleware(ch contextHandler, c Context, ms ...middleware) http.HandlerFunc {
@@ -33,4 +33,22 @@ func addMiddleware(ch contextHandler, c Context, ms ...middleware) http.HandlerF
 		c.Vars = mux.Vars(r)
 		ch(w, r, c)
 	}
+}
+
+func isAuthed(ch contextHandler) contextHandler {
+	outFunc := func(w http.ResponseWriter, r *http.Request, c Context) {
+		session, err := c.Store.Get(r, c.SessionName)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		if session.Values["user"] == nil {
+			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+			return
+		}
+
+		ch(w, r, c)
+	}
+	return outFunc
 }
