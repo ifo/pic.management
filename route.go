@@ -16,7 +16,6 @@ func router(c Context) *mux.Router {
 type contextHandler func(http.ResponseWriter, *http.Request, Context)
 type middleware func(contextHandler) contextHandler
 
-
 func indexHandler(w http.ResponseWriter, r *http.Request, c Context) {
 	w.Write([]byte("Under construction"))
 }
