@@ -24,7 +24,21 @@ func SetupDB(c DBConfig) (*sql.DB, error) {
 
 	// TODO setup the tables
 
+	// create user table
+	createUserTable := fmt.Sprintf(
+		"CREATE TABLE %s (id INTEGER PRIMARY KEY ASC, email TEXT, username TEXT, password TEXT);",
+		c.UserTableName)
+	_, err = db.Exec(createUserTable)
+	// ignore existence error
+	if err != nil && err.Error() != existenceError(c.UserTableName) {
+		return nil, err
+	}
+
 	return db, nil
+}
+
+func existenceError(name string) string {
+	return "table " + name + " already exists"
 }
 
 type PreparedStatements struct {
