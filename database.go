@@ -7,14 +7,16 @@ import (
 )
 
 type DBConfig struct {
+	URL            string
+	Type           string
 	UserTableName  string
 	PhotoTableName string
 	ImageTableName string
 	// TODO? add Album and Group
 }
 
-func SetupDB(dbURL string) (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", dbURL)
+func SetupDB(c DBConfig) (*sql.DB, error) {
+	db, err := sql.Open(c.Type, c.URL)
 	if err != nil {
 		return nil, err
 	}

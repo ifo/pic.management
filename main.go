@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"flag"
 	"log"
 	"net/http"
@@ -52,7 +53,17 @@ func setup() (*Context, string, error) {
 	}
 
 	store := sessions.NewCookieStore([]byte(*sessionSecret))
-	db, err := SetupDB(*dbURL)
+
+	dbType, err := getDBType(*dbURL)
+	if err != nil {
+		return nil, "", err
+	}
+
+	dbConfig := DBConfig{
+		URL:  *dbURL,
+		Type: dbType,
+	}
+	db, err := SetupDB(dbConfig)
 	if err != nil {
 		return nil, "", err
 	}
@@ -64,4 +75,25 @@ type Context struct {
 	DB          *sql.DB
 	Store       *sessions.CookieStore
 	SessionName string
+}
+
+func getDBType(url string) (string, error) {
+	proto := getProtocol(url)
+	switch proto {
+	case "file", "sqlite", "sqlite3":
+		return "sqlite3", nil
+	case "postgres":
+		return "postgres", nil
+	default:
+		return "", errors.New("Unknown database protocol")
+	}
+}
+
+func getProtocol(url string) string {
+	for i, r := range url {
+		if r == ':' {
+			return url[:i]
+		}
+	}
+	return ""
 }
