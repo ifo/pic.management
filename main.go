@@ -25,15 +25,15 @@ func main() {
 func setup() (*Context, string, error) {
 	var (
 		defaultSessionSecret = "session-secret"
-		defaultDbURL         = "file:db/sqlite.db"
+		defaultDBURL         = "file:db/sqlite.db"
 		defaultPort          = 3000
 		defaultSessionName   = "session-name"
 		sessionSecret        = flag.String("session", defaultSessionSecret, "Set the session secret")
-		dbURL                = flag.String("db", defaultDbURL, "Set the database connection string")
+		dbURL                = flag.String("db", defaultDBURL, "Set the database connection string")
 		port                 = flag.Int("port", defaultPort, "Set the server port")
 		sessionName          = flag.String("session-name", defaultSessionName, "Set the session name")
 		envSessionSecret     = os.Getenv("SESSION_SECRET")
-		envDbURL             = os.Getenv("DATABASE_URL")
+		envDBURL             = os.Getenv("DATABASE_URL")
 		outPort              = os.Getenv("PORT")
 		envSessionName       = os.Getenv("SESSION_NAME")
 	)
@@ -42,8 +42,8 @@ func setup() (*Context, string, error) {
 	if *sessionSecret == defaultSessionSecret && envSessionSecret != "" {
 		sessionSecret = &envSessionSecret
 	}
-	if *dbURL == defaultDbURL && envDbURL != "" {
-		dbURL = &envDbURL
+	if *dbURL == defaultDBURL && envDBURL != "" {
+		dbURL = &envDBURL
 	}
 	if *port != defaultPort || outPort == "" {
 		outPort = strconv.Itoa(defaultPort)
