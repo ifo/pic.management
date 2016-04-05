@@ -42,14 +42,14 @@ func existenceError(name string) string {
 }
 
 type PreparedStatements struct {
-	Login   *sql.Stmt
+	GetUser *sql.Stmt
 	NewUser *sql.Stmt
 }
 
 func SetupStmts(db *sql.DB, c DBConfig) (*PreparedStatements, error) {
 	var err error
 	stmts := &PreparedStatements{}
-	stmts.Login, err = CreateLoginQuery(db, c)
+	stmts.GetUser, err = CreateGetUserQuery(db, c)
 	if err != nil {
 		return nil, err
 	}
@@ -61,8 +61,8 @@ func SetupStmts(db *sql.DB, c DBConfig) (*PreparedStatements, error) {
 	return stmts, nil
 }
 
-func CreateLoginQuery(db *sql.DB, c DBConfig) (*sql.Stmt, error) {
-	stmt := fmt.Sprintf("SELECT password FROM %s WHERE email = $1;", c.UserTableName)
+func CreateGetUserQuery(db *sql.DB, c DBConfig) (*sql.Stmt, error) {
+	stmt := fmt.Sprintf("SELECT (id, email, password) FROM %s WHERE email = $1;", c.UserTableName)
 	return db.Prepare(stmt)
 }
 
