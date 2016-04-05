@@ -26,7 +26,7 @@ func SetupDB(c DBConfig) (*sql.DB, error) {
 
 	// create user table
 	createUserTable := fmt.Sprintf(
-		"CREATE TABLE %s (id INTEGER PRIMARY KEY ASC, email TEXT, username TEXT, password TEXT);",
+		"CREATE TABLE %s (id INTEGER PRIMARY KEY ASC, email TEXT UNIQUE, password TEXT);",
 		c.UserTableName)
 	_, err = db.Exec(createUserTable)
 	// ignore existence error
@@ -66,8 +66,9 @@ func CreateLoginQuery(db *sql.DB, c DBConfig) (*sql.Stmt, error) {
 	return db.Prepare(stmt)
 }
 
+// CreateNewUserQuery returns the ID of the newly created user
 func CreateNewUserQuery(db *sql.DB, c DBConfig) (*sql.Stmt, error) {
-	stmt := fmt.Sprintf("INSERT INTO %s (email, username, password) VALUES ($1, $2, $3);",
+	stmt := fmt.Sprintf("INSERT INTO %s (email, password) VALUES ($1, $2); SELECT id FROM %s WHERE email = $1;",
 		c.UserTableName)
 	return db.Prepare(stmt)
 }

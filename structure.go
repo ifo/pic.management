@@ -3,9 +3,8 @@ package main
 import ()
 
 type User struct {
-	ID       int64
-	Email    string
-	Username string
+	ID    int64
+	Email string
 }
 
 type Photo struct {
