@@ -66,12 +66,14 @@ func newUserHandler(w http.ResponseWriter, r *http.Request, c Context) {
 	err = newUserQuery.Scan(&userID)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
+		return
 	}
 
 	// login
 	session, err := c.Store.Get(r, c.SessionName)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
+		return
 	}
 
 	user := &User{ID: userID, Email: email}
@@ -79,6 +81,7 @@ func newUserHandler(w http.ResponseWriter, r *http.Request, c Context) {
 	err = session.Save(r, w)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
+		return
 	}
 
 	http.Redirect(w, r, "/", 303)
