@@ -12,6 +12,7 @@ func router(c Context) *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/", addMiddleware(indexHandler, c, isAuthed)).Methods("GET")
 	r.HandleFunc("/login", addMiddleware(loginHandler, c)).Methods("GET", "POST")
+	r.HandleFunc("/logout", addMiddleware(logoutHandler, c)).Methods("GET")
 	r.HandleFunc("/newuser", addMiddleware(newUserHandler, c)).Methods("POST")
 	return r
 }
@@ -77,6 +78,23 @@ func loginHandler(w http.ResponseWriter, r *http.Request, c Context) {
 	}
 
 	http.Redirect(w, r, "/", 303)
+}
+
+func logoutHandler(w http.ResponseWriter, r *http.Request, c Context) {
+	session, err := c.Store.Get(r, c.SessionName)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	session.Values["user"] = &User{}
+	err = session.Save(r, w)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	http.Redirect(w, r, "/", 302)
 }
 
 func newUserHandler(w http.ResponseWriter, r *http.Request, c Context) {
