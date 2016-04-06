@@ -16,6 +16,7 @@ type DBConfig struct {
 	// TODO? add Album and Group
 }
 
+// TODO move table creation and database setup to another project
 func SetupDB(c DBConfig) (*sql.DB, error) {
 	db, err := sql.Open(c.Type, c.URL)
 	if err != nil {
