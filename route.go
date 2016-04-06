@@ -115,6 +115,13 @@ func newUserHandler(w http.ResponseWriter, r *http.Request, c Context) {
 		return
 	}
 
+	// TODO? add this constraint to configuration
+	if len(password) < 7 {
+		password, passwordCheck = "", ""
+		http.Error(w, "password must be 8 characters or longer", http.StatusBadRequest)
+		return
+	}
+
 	// TODO handle database connection error
 	if _, err := c.PS.GetUser.Query(email); err != nil && err != sql.ErrNoRows {
 		password, passwordCheck = "", ""
