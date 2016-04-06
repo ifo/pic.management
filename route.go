@@ -24,7 +24,59 @@ func indexHandler(w http.ResponseWriter, r *http.Request, c Context) {
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request, c Context) {
-	w.Write([]byte("Login under construction"))
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+
+	if email == "" || password == "" {
+		password = ""
+		http.Error(w, "please provide an email and password", http.StatusBadRequest)
+		return
+	}
+
+	if len(password) < 7 {
+		password = ""
+		http.Error(w, "passwords must be longer than 7 characters", http.StatusBadRequest)
+		return
+	}
+
+	var userID int64
+	var bcryptPass string
+	err := c.PS.GetUser.QueryRow(email).Scan(&userID, &email, &bcryptPass)
+	if err != nil && err != sql.ErrNoRows {
+		password = ""
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	if err == sql.ErrNoRows {
+		password, bcryptPass = "", ""
+		http.Error(w, "that email and password combination do not match", http.StatusBadRequest)
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(bcryptPass), []byte(password))
+	password, bcryptPass = "", ""
+	if err != nil {
+		http.Error(w, "that email and password combination do not match", http.StatusBadRequest)
+		return
+	}
+
+	// login
+	session, err := c.Store.Get(r, c.SessionName)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	user := &User{ID: userID, Email: email}
+	session.Values["user"] = user
+	err = session.Save(r, w)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	http.Redirect(w, r, "/", 303)
 }
 
 func newUserHandler(w http.ResponseWriter, r *http.Request, c Context) {
@@ -60,7 +112,7 @@ func newUserHandler(w http.ResponseWriter, r *http.Request, c Context) {
 		return
 	}
 
-	newUserQuery := c.PS.NewUser.QueryRow(email, bcryptPass)
+	newUserQuery := c.PS.NewUser.QueryRow(email, string(bcryptPass))
 	zero(bcryptPass)
 	var userID int64
 	err = newUserQuery.Scan(&userID)
