@@ -11,7 +11,8 @@ import (
 func router(c Context) *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/", addMiddleware(indexHandler, c, isAuthed)).Methods("GET")
-	r.HandleFunc("/login", addMiddleware(loginHandler, c)).Methods("GET", "POST")
+	r.HandleFunc("/login", addMiddleware(loginPageHandler, c)).Methods("GET")
+	r.HandleFunc("/login", addMiddleware(loginHandler, c)).Methods("POST")
 	r.HandleFunc("/logout", addMiddleware(logoutHandler, c)).Methods("GET")
 	r.HandleFunc("/newuser", addMiddleware(newUserHandler, c)).Methods("POST")
 	return r
@@ -22,6 +23,10 @@ type middleware func(contextHandler) contextHandler
 
 func indexHandler(w http.ResponseWriter, r *http.Request, c Context) {
 	w.Write([]byte("Under construction"))
+}
+
+func loginPageHandler(w http.ResponseWriter, r *http.Request, c Context) {
+	w.Write([]byte("Login page under construction"))
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request, c Context) {
