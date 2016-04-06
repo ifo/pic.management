@@ -16,30 +16,9 @@ type DBConfig struct {
 	// TODO? add Album and Group
 }
 
-// TODO move table creation and database setup to another project
-func SetupDB(c DBConfig) (*sql.DB, error) {
-	db, err := sql.Open(c.Type, c.URL)
-	if err != nil {
-		return nil, err
-	}
-
-	// TODO setup the tables
-
-	// create user table
-	createUserTable := fmt.Sprintf(
-		"CREATE TABLE %s (id INTEGER PRIMARY KEY ASC, email TEXT UNIQUE, password TEXT);",
-		c.UserTableName)
-	_, err = db.Exec(createUserTable)
-	// ignore existence error
-	if err != nil && err.Error() != existenceError(c.UserTableName) {
-		return nil, err
-	}
-
-	return db, nil
-}
-
-func existenceError(name string) string {
-	return "table " + name + " already exists"
+// TODO? make these functions DBConfig methods
+func Connect(c DBConfig) (*sql.DB, error) {
+	return sql.Open(c.Type, c.URL)
 }
 
 type PreparedStatements struct {

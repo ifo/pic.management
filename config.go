@@ -56,7 +56,7 @@ func setup() (*Context, string, error) {
 		Type:          dbType,
 		UserTableName: defaultUserTableName,
 	}
-	db, err := SetupDB(dbConfig)
+	db, err := Connect(dbConfig)
 	if err != nil {
 		return nil, "", err
 	}
