@@ -63,7 +63,7 @@ func SetupStmts(db *sql.DB, c DBConfig) (*PreparedStatements, error) {
 }
 
 func CreateGetUserQuery(db *sql.DB, c DBConfig) (*sql.Stmt, error) {
-	stmt := fmt.Sprintf("SELECT (id, email, password) FROM %s WHERE email = $1;", c.UserTableName)
+	stmt := fmt.Sprintf("SELECT id, email, password FROM %s WHERE email = $1;", c.UserTableName)
 	return db.Prepare(stmt)
 }
 
