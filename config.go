@@ -9,6 +9,13 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+type Context struct {
+	Vars        map[string]string
+	PS          *PreparedStatements
+	Store       *sessions.CookieStore
+	SessionName string
+}
+
 func setup() (*Context, string, error) {
 	var (
 		defaultSessionSecret = "session-secret"
@@ -66,13 +73,6 @@ func setup() (*Context, string, error) {
 	}
 
 	return &Context{PS: stmts, Store: store, SessionName: *sessionName}, outPort, nil
-}
-
-type Context struct {
-	Vars        map[string]string
-	PS          *PreparedStatements
-	Store       *sessions.CookieStore
-	SessionName string
 }
 
 func getDBType(url string) (string, error) {
