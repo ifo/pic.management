@@ -11,6 +11,7 @@ import (
 
 type Context struct {
 	Vars        map[string]string
+	Templates   *Templates
 	PS          *PreparedStatements
 	Store       *sessions.CookieStore
 	SessionName string
@@ -34,6 +35,10 @@ func setup() (*Context, string, error) {
 		sessionName        = flag.String("session-name", defaultSessionName, "Set the session name")
 		envSessionName     = os.Getenv("SESSION_NAME")
 
+		defaultTemplatesDir = "templates"
+		templatesDir        = flag.String("templates", defaultTemplatesDir, "Set the templates directory")
+		envTemplatesDir     = os.Getenv("TEMPLATES_DIR")
+
 		defaultUserTableName = "user"
 	)
 	flag.Parse()
@@ -49,6 +54,9 @@ func setup() (*Context, string, error) {
 	}
 	if *sessionName == defaultSessionName && envSessionName != "" {
 		sessionName = &envSessionName
+	}
+	if *templatesDir == defaultTemplatesDir && envTemplatesDir != "" {
+		templatesDir = &envTemplatesDir
 	}
 
 	store := sessions.NewCookieStore([]byte(*sessionSecret))
@@ -72,7 +80,17 @@ func setup() (*Context, string, error) {
 		return nil, "", err
 	}
 
-	return &Context{PS: stmts, Store: store, SessionName: *sessionName}, outPort, nil
+	templates, err := SetupTemplates(*templatesDir)
+	if err != nil {
+		return nil, "", err
+	}
+
+	return &Context{
+		Templates:   templates,
+		PS:          stmts,
+		Store:       store,
+		SessionName: *sessionName,
+	}, outPort, nil
 }
 
 func getDBType(url string) (string, error) {

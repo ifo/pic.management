@@ -22,7 +22,7 @@ type contextHandler func(http.ResponseWriter, *http.Request, Context)
 type middleware func(contextHandler) contextHandler
 
 func indexHandler(w http.ResponseWriter, r *http.Request, c Context) {
-	w.Write([]byte("Under construction"))
+	c.Templates.Index.Execute(w, "")
 }
 
 func loginPageHandler(w http.ResponseWriter, r *http.Request, c Context) {
