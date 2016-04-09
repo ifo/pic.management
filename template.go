@@ -9,7 +9,7 @@ type Templates struct {
 }
 
 func SetupTemplates(dir string) (*Templates, error) {
-	index, err := template.ParseFiles("templates/index.html")
+	index, err := template.ParseFiles(dir + "/index.html")
 	if err != nil {
 		return nil, err
 	}
