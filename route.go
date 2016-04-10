@@ -14,8 +14,8 @@ func router(c Context) *mux.Router {
 	r.HandleFunc("/login", addMiddleware(loginPageHandler, c)).Methods("GET")
 	r.HandleFunc("/login", addMiddleware(loginHandler, c)).Methods("POST")
 	r.HandleFunc("/logout", addMiddleware(logoutHandler, c)).Methods("GET")
-	r.HandleFunc("/newuser", addMiddleware(newUserPageHandler, c)).Methods("GET")
-	r.HandleFunc("/newuser", addMiddleware(newUserHandler, c)).Methods("POST")
+	r.HandleFunc("/signup", addMiddleware(signupPageHandler, c)).Methods("GET")
+	r.HandleFunc("/signup", addMiddleware(signupHandler, c)).Methods("POST")
 	return r
 }
 
@@ -103,11 +103,11 @@ func logoutHandler(w http.ResponseWriter, r *http.Request, c Context) {
 	http.Redirect(w, r, "/", 302)
 }
 
-func newUserPageHandler(w http.ResponseWriter, r *http.Request, c Context) {
-	c.Templates.NewUser.Execute(w, "")
+func signupPageHandler(w http.ResponseWriter, r *http.Request, c Context) {
+	c.Templates.Signup.Execute(w, "")
 }
 
-func newUserHandler(w http.ResponseWriter, r *http.Request, c Context) {
+func signupHandler(w http.ResponseWriter, r *http.Request, c Context) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 	passwordCheck := r.FormValue("password2")
@@ -147,10 +147,10 @@ func newUserHandler(w http.ResponseWriter, r *http.Request, c Context) {
 		return
 	}
 
-	newUserQuery := c.PS.NewUser.QueryRow(email, string(bcryptPass))
+	signupQuery := c.PS.Signup.QueryRow(email, string(bcryptPass))
 	zero(bcryptPass)
 	var userID int64
-	err = newUserQuery.Scan(&userID)
+	err = signupQuery.Scan(&userID)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return

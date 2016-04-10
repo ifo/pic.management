@@ -23,7 +23,7 @@ func Connect(c DBConfig) (*sql.DB, error) {
 
 type PreparedStatements struct {
 	GetUser *sql.Stmt
-	NewUser *sql.Stmt
+	Signup  *sql.Stmt
 }
 
 func SetupStmts(db *sql.DB, c DBConfig) (*PreparedStatements, error) {
@@ -33,7 +33,7 @@ func SetupStmts(db *sql.DB, c DBConfig) (*PreparedStatements, error) {
 	if err != nil {
 		return nil, err
 	}
-	stmts.NewUser, err = CreateNewUserQuery(db, c)
+	stmts.Signup, err = CreateSignupQuery(db, c)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +46,8 @@ func CreateGetUserQuery(db *sql.DB, c DBConfig) (*sql.Stmt, error) {
 	return db.Prepare(stmt)
 }
 
-// CreateNewUserQuery returns the ID of the newly created user
-func CreateNewUserQuery(db *sql.DB, c DBConfig) (*sql.Stmt, error) {
+// CreateSignupQuery returns the ID of the newly created user
+func CreateSignupQuery(db *sql.DB, c DBConfig) (*sql.Stmt, error) {
 	stmt := fmt.Sprintf("INSERT INTO %s (email, password) VALUES ($1, $2); SELECT id FROM %s WHERE email = $1;",
 		c.UserTableName)
 	return db.Prepare(stmt)
