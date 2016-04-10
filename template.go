@@ -5,8 +5,9 @@ import (
 )
 
 type Templates struct {
-	Index *template.Template
-	Login *template.Template
+	Index   *template.Template
+	Login   *template.Template
+	NewUser *template.Template
 }
 
 func SetupTemplates(dir string) (*Templates, error) {
@@ -18,9 +19,14 @@ func SetupTemplates(dir string) (*Templates, error) {
 	if err != nil {
 		return nil, err
 	}
+	newUser, err := template.ParseFiles(dir + "/newuser.html")
+	if err != nil {
+		return nil, err
+	}
 
 	return &Templates{
-		Index: index,
-		Login: login,
+		Index:   index,
+		Login:   login,
+		NewUser: newUser,
 	}, nil
 }

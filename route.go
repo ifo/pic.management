@@ -14,6 +14,7 @@ func router(c Context) *mux.Router {
 	r.HandleFunc("/login", addMiddleware(loginPageHandler, c)).Methods("GET")
 	r.HandleFunc("/login", addMiddleware(loginHandler, c)).Methods("POST")
 	r.HandleFunc("/logout", addMiddleware(logoutHandler, c)).Methods("GET")
+	r.HandleFunc("/newuser", addMiddleware(newUserPageHandler, c)).Methods("GET")
 	r.HandleFunc("/newuser", addMiddleware(newUserHandler, c)).Methods("POST")
 	return r
 }
@@ -102,10 +103,14 @@ func logoutHandler(w http.ResponseWriter, r *http.Request, c Context) {
 	http.Redirect(w, r, "/", 302)
 }
 
+func newUserPageHandler(w http.ResponseWriter, r *http.Request, c Context) {
+	c.Templates.NewUser.Execute(w, "")
+}
+
 func newUserHandler(w http.ResponseWriter, r *http.Request, c Context) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
-	passwordCheck := r.FormValue("repeat")
+	passwordCheck := r.FormValue("password2")
 
 	// TODO for all errors redirect and show flash message
 	if email == "" {
