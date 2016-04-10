@@ -26,7 +26,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request, c Context) {
 }
 
 func loginPageHandler(w http.ResponseWriter, r *http.Request, c Context) {
-	w.Write([]byte("Login page under construction"))
+	c.Templates.Login.Execute(w, "")
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request, c Context) {
