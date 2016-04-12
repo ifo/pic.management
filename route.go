@@ -75,8 +75,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request, c Context) {
 		return
 	}
 
-	user := &User{ID: userID, Email: email}
-	session.Values["user"] = user
+	session.Values["id"] = userID
+	session.Values["email"] = email
 	err = session.Save(r, w)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -93,7 +93,8 @@ func logoutHandler(w http.ResponseWriter, r *http.Request, c Context) {
 		return
 	}
 
-	session.Values["user"] = &User{}
+	session.Values["id"] = nil
+	session.Values["email"] = nil
 	err = session.Save(r, w)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -163,8 +164,8 @@ func signupHandler(w http.ResponseWriter, r *http.Request, c Context) {
 		return
 	}
 
-	user := &User{ID: userID, Email: email}
-	session.Values["user"] = user
+	session.Values["id"] = userID
+	session.Values["email"] = email
 	err = session.Save(r, w)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -192,7 +193,7 @@ func isAuthed(ch contextHandler) contextHandler {
 			return
 		}
 
-		if session.Values["user"] == nil {
+		if session.Values["id"] == nil {
 			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 			return
 		}
