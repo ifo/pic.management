@@ -1,6 +1,12 @@
 package main
 
-import ()
+import (
+	"encoding/gob"
+)
+
+func init() {
+	gob.Register(&User{})
+}
 
 type User struct {
 	ID    int64
